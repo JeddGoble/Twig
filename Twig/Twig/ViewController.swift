@@ -54,7 +54,7 @@ extension ViewController: BoardViewDelegate {
         gameState.currentTurn.action = .play // Placeholder. Later must account for pass, resign, etc
         
         // Log here
-        gameState.board.turns.append(gameState.currentTurn)
+        gameState.board.turns.insert(gameState.currentTurn)
         
         // Swap here
         gameState.currentTurn = createNextTurn(fromTurn: gameState.currentTurn)!

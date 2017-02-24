@@ -2,7 +2,7 @@
 //  UIColor+Additions.swift
 //  Twig
 //
-//  Created by jgoble52 on 2/23/17.
+//  Created by Jedd Goble on 2/23/17.
 //  Copyright © 2017 Bells & Missiles. All rights reserved.
 //
 

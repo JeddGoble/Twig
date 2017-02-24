@@ -8,11 +8,19 @@
 
 import UIKit
 
-struct Turn {
+struct Turn: Hashable, Equatable {
     var turnNumber: Int
     var player: Player
     var action: TurnAction
     var stone: Stone?
+    
+    var hashValue: Int {
+        return turnNumber.hashValue
+    }
+    
+    static func ==(lhs: Turn, rhs: Turn) -> Bool {
+        return lhs.turnNumber == rhs.turnNumber
+    }
 }
 
 enum TurnAction {
@@ -33,16 +41,16 @@ enum PlayerColor {
 }
 
 struct Board {
-    var turns: [Turn]
+    var turns: Set<Turn>
     var size: Int = 19
     
-    var allPositions: [Position] {
-        var positions: [Position] = []
+    var allPositions: Set<Position> {
+        var positions: Set<Position> = []
         for turn in self.turns {
             guard let position = turn.stone?.position else {
                 continue
             }
-            positions.append(position)
+            positions.insert(position)
         }
         return positions
     }
@@ -62,7 +70,7 @@ struct Board {
         return nil
     }
     
-    init(turns: [Turn], size: Int = 19) {
+    init(turns: Set<Turn>, size: Int = 19) {
         self.turns = turns
         self.size = size
     }
@@ -97,10 +105,14 @@ class GameState: NSCopying {
     }
 }
 
-struct Position: Equatable {
+struct Position: Hashable, Equatable {
     
     var x: Int
     var y: Int
+    
+    var hashValue: Int {
+        return "\(x),\(y)".hashValue
+    }
     
     static func ==(lhs: Position, rhs: Position) -> Bool {
         if lhs.x == rhs.x && lhs.y == rhs.y {
@@ -118,20 +130,34 @@ struct Stone {
     
 }
 
-struct Group {
+struct Group: Hashable, Equatable {
     
     var color: PlayerColor
-    var turns: [Turn]
+    var turns: Set<Turn>
     var liberties: Int?
     
-    var allPositions: [Position] {
-        var positions: [Position] = []
+    var allPositions: Set<Position> {
+        var positions: Set<Position> = []
         for turn in self.turns {
             guard let position = turn.stone?.position else {
                 continue
             }
-            positions.append(position)
+            positions.insert(position)
         }
         return positions
     }
+    
+    var hashValue: Int {
+        return turns.hashValue
+    }
+    
+    static func ==(lhs: Group, rhs: Group) -> Bool {
+        for turn in lhs.turns {
+            if !rhs.turns.contains(turn) {
+                return false
+            }
+        }
+        return true
+    }
+    
 }
