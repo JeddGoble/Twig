@@ -12,12 +12,8 @@ class GameManager {
     
     func analyzeBoard(gameState: GameState) -> GameState {
         
-        var groups: Set<Group> = []
-        
         // Create groups based on board
-        for turn in gameState.board.turns {
-            groups = checkForGroupsWithTurn(thisTurn: turn, gameState: gameState, groups: &groups)
-        }
+        let groups = checkForGroups(gameState: gameState)
         
         var newGroups: Set<Group> = []
         // Check groups for liberties & captures
@@ -85,69 +81,71 @@ class GameManager {
         return adjacentPositions
     }
     
-    private func checkForGroupsWithTurn(thisTurn: Turn, gameState: GameState, groups: inout Set<Group>) -> Set<Group> {
+    private func checkForGroups(gameState: GameState) -> Set<Group> {
         
-        guard let position = thisTurn.stone?.position else {
-            return groups
-        }
+        let turns = gameState.board.turns
+        var groups: Set<Group> = []
         
-        // Check to make sure the turn position isn't already in a group
-        for group in groups {
-            if group.allPositions.contains(where: { $0 == position }) {
+        for thisTurn in turns {
+            
+            guard let position = thisTurn.stone?.position else {
                 return groups
             }
-        }
-        
-        // Get the spaces adjacent to the turn's position
-        let adjacentPositions = getAdjacentPositions(forPosition: position, withGameState: gameState)
-        
-        var newGroups: Set<Group> = groups // Must create new Set since Sets cannot be mutated while iterating
-        
-        // Iterate through adjacent positions
-        for adjacentPosition in adjacentPositions {
             
-            // Iterate through the current board's turns
-            for gameTurn in gameState.board.turns {
-                guard let gameStone = gameTurn.stone, let thisStone = thisTurn.stone else {
-                    continue
+            // Check to make sure the turn position isn't already in a group
+            for group in groups {
+                if group.allPositions.contains(position) {
+                    return groups
                 }
+            }
+            
+            // Get the spaces adjacent to the turn's position
+            let adjacentPositions = getAdjacentPositions(forPosition: position, withGameState: gameState)
+            
+            var foundExistingGroup = false
+            
+            // Iterate through adjacent positions
+            for adjacentPosition in adjacentPositions {
                 
-                // Check to see if we found a stone in the adjacent position and same color
-                if gameStone.position == adjacentPosition && gameStone.color == thisStone.color {
-                    
-                    // Found stone of same color, so check to make sure it's not already in a group
-                    for group in groups {
-                        if group.allPositions.contains(thisStone.position) {
-                            // Stone is alraedy in a group. Simply return so we can move on.
-                            return groups
-                        }
+                // Iterate through the current board's turns
+                for gameTurn in gameState.board.turns {
+                    guard let gameStone = gameTurn.stone, let thisStone = thisTurn.stone else {
+                        continue
                     }
                     
-                    // Did not find stone in existing group. So find which group it should belong to.
-                    var foundGroup = false
-                    for group in groups {
-                        var newGroup: Group = group
-                        if group.allPositions.contains(adjacentPosition) {
-                            if gameState.board.getTurnForPosition(adjacentPosition)?.stone?.color == thisStone.color {
-                                newGroup.turns.insert(thisTurn)
-                                foundGroup = true
+                    // Check to see if we found a stone in the adjacent position and same color
+                    if gameStone.position == adjacentPosition && gameStone.color == thisStone.color {
+                        
+                        // Found stone of same color, so check to make sure it's not already in a group
+                        for group in groups {
+                            if group.allPositions.contains(thisStone.position) {
+                                // Stone is already in a group. Simply return so we can move on.
+                                return groups
                             }
                         }
-                        newGroups.insert(newGroup)
-                    }
-                    
-                    if foundGroup {
-                        return newGroups
+                        
+                        // Did not find stone in existing group. So find which group it should belong to.
+                        for group in groups {
+                            let groupToRemove = group
+                            var newGroup: Group = group
+                            if group.allPositions.contains(adjacentPosition) {
+                                if let adjacentColor = gameState.board.getTurnForPosition(adjacentPosition)?.stone?.color, adjacentColor == thisStone.color {
+                                    newGroup.turns.insert(thisTurn)
+                                    foundExistingGroup = true
+                                }
+                            }
+                            // A bit of hackery to skirt the fact that we can't add elements while iterating
+                            groups.remove(groupToRemove)
+                            groups.insert(newGroup)
+                        }
                     }
                 }
             }
             
             // Still haven't found a home for this stone. So create a new Group for this stone.
-            if let color = thisTurn.stone?.color {
+            if let color = thisTurn.stone?.color, !foundExistingGroup {
                 groups.insert(Group(color: color, turns: [thisTurn], liberties: nil))
             }
-            
-            return groups
         }
         
         return groups
