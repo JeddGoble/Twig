@@ -23,6 +23,7 @@ class ViewController: UIViewController {
     
     func startNewGame() {
         gameState = GameState()
+        boardView.gameState = gameState
     }
     
     func createNextTurn(fromTurn lastTurn: Turn) -> Turn? {
@@ -44,11 +45,22 @@ class ViewController: UIViewController {
         let nextTurn = Turn(turnNumber: nextTurnNumber, player: nextPlayer!, action: .incomplete, stone: nil)
         return nextTurn
     }
+    
+    @IBAction func onNewGameButtonTapped(_ sender: UIButton) {
+        
+        startNewGame()
+    }
+    
 }
 
 extension ViewController: BoardViewDelegate {
     
     func didTapBoard(atPosition position: Position) {
+        
+        guard !gameState.board.allPositions.contains(position) else {
+            print("Tapped on existing stone")
+            return
+        }
         
         gameState.currentTurn.stone = Stone(color: gameState.currentTurn.player.color, position: position)
         gameState.currentTurn.action = .play // Placeholder. Later must account for pass, resign, etc

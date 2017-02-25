@@ -29,12 +29,27 @@
                                     <constraint firstAttribute="width" secondItem="RYP-x9-djY" secondAttribute="height" multiplier="1:1" id="a9V-el-BzR"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GqI-Oq-8cq">
+                                <rect key="frame" x="136" y="601" width="103" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="D4T-Qf-qlS"/>
+                                    <constraint firstAttribute="width" constant="103" id="waP-Uy-tDD"/>
+                                </constraints>
+                                <state key="normal" title="New Game">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onNewGameButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Fju-JQ-zY2"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.31372549019607843" green="0.31372549019607843" blue="0.3529411764705882" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="GqI-Oq-8cq" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="GM4-K6-lzh"/>
                             <constraint firstItem="RYP-x9-djY" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Ukp-3p-YKP"/>
                             <constraint firstAttribute="trailing" secondItem="RYP-x9-djY" secondAttribute="trailing" id="XSz-yc-Mle"/>
                             <constraint firstItem="RYP-x9-djY" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" id="fpd-3Y-Tc7"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="GqI-Oq-8cq" secondAttribute="bottom" constant="36" id="hnE-bL-kyO"/>
                         </constraints>
                     </view>
                     <connections>
